@@ -1,9 +1,17 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <!-- <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+      <router-link to="/about">About</router-link> |
+      <router-link to="/closedbeta">ClosedBeta</router-link>
+    </div> -->
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img src="./assets/navbar-logo.png" width="112" height="28">
+        </a>
+      </div>
+    </nav>
     <router-view/>
   </div>
 </template>
