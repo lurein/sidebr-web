@@ -58,7 +58,8 @@
         </div>
         <div class="field">
           <p class="control">
-            <button class="button is-medium" style="background-color: #6890F6; color: #FFF">
+            <button class="button is-medium" v-on:click="createUser()"
+             style="background-color: #6890F6; color: #FFF">
               Create Account
             </button>
           </p>
@@ -101,6 +102,7 @@
 </template>
 <script>
 // @ is an alias to /src
+/* eslint-disable prefer-arrow-callback, prefer-template */
 
 export default {
   name: 'ClosedBeta',
@@ -122,6 +124,19 @@ export default {
       this.teammates.push({
         value: '',
       });
+    },
+    createUser() {
+      this.$FireAuth.createUserWithEmailAndPassword(this.email, this.password).then(
+        function (user) {
+          console.log(user.uid);
+          this.$Firestore.collection('users').doc(user.uid).set({
+            name: this.fullName, // need to add in team
+          });
+        },
+        function (err) {
+          alert('Oops. ' + err.message);
+        },
+      );
     },
   },
 };
