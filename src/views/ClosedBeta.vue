@@ -59,6 +59,7 @@
         <div class="field">
           <p class="control">
             <button class="button is-medium" v-on:click="createUser()"
+             v-bind:class="{ 'is-loading' : loading }"
              style="background-color: #6890F6; color: #FFF">
               Create Account
             </button>
@@ -69,7 +70,34 @@
   </div>
   </section>
 <!-- end of user profile section -->
+<!-- image upload section -->
   <section v-if="sectionIndex == 3" class="hero is-fullheight">
+  <div class="container hero-body">
+    <div class="columns is-centered is-vcentered">
+      <div class="column is-full">
+        <h2 class="is-size-2">Now lets pick a 🔥 photo for your avatar </h2>
+        <div class="file">
+          <label class="file-label">
+            <input class="file-input" type="file" @change="onFileChange" name="resume">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Choose a file…
+              </span>
+            </span>
+          </label>
+        </div>
+        <button class="button is-medium is-success" v-bind:class="{ 'is-loading' : loading }"
+          v-if="dp !== null" v-on:click="uploadImage()">
+          Good to go
+        </button>
+      </div>
+    </div>
+  </div>
+  </section>
+  <section v-if="sectionIndex == 4" class="hero is-fullheight">
   <div class="container hero-body">
     <div class="columns is-centered is-vcentered">
       <h2 class="is-size-2">Finally, Let's Get Some Teammates Onboard</h2>
@@ -102,7 +130,7 @@
 </template>
 <script>
 // @ is an alias to /src
-/* eslint-disable prefer-arrow-callback, prefer-template */
+/* eslint-disable prefer-arrow-callback, prefer-template, no-unused-vars, arrow-parens */
 
 export default {
   name: 'ClosedBeta',
@@ -114,6 +142,9 @@ export default {
       email: '',
       password: '',
       teammates: [{ value: '' }],
+      dp: null,
+      dpURL: '',
+      loading: false,
     };
   },
   methods: {
@@ -126,17 +157,64 @@ export default {
       });
     },
     createUser() {
+      this.loading = true;
+      const this2 = this;
       this.$FireAuth.createUserWithEmailAndPassword(this.email, this.password).then(
         function (user) {
-          console.log(user.uid);
-          this.$Firestore.collection('users').doc(user.uid).set({
-            name: this.fullName, // need to add in team
+          const this3 = this2;
+          const user2 = user;
+          this2.$Firestore.collection('users').doc(user.user.uid).set({
+            fullName: this2.fullName,
+          }).then(function () {
+            const member = this3.$Firestore.doc('users/' + user2.user.uid);
+            this3.$Firestore.collection('teams').doc(this3.teamName).set({
+              name: this3.teamName,
+              members: [member],
+            });
+            this3.loading = false;
+            this3.nextStep();
           });
         },
         function (err) {
           alert('Oops. ' + err.message);
         },
       );
+    },
+    onFileChange(e) {
+      const file = e.target.files[0];
+      this.dp = URL.createObjectURL(file);
+    },
+    uploadImage() {
+      this.loading = true;
+      this.getFileBlob(this.dp, blob => {
+        const this2 = this;
+        const storageRef = this.$FirebaseStorage.ref().child('userDPs/' + this.$FireAuth.currentUser.uid);
+        storageRef.put(blob).then(response => {
+          response.ref.getDownloadURL().then(downloadURL => {
+            this.dpURL = downloadURL;
+            this.updateUser();
+          });
+          console.log('Uploaded file!');
+        });
+      });
+    },
+    updateUser() {
+      const teamRef = this.$Firestore.doc('teams/' + this.teamName);
+      this.$Firestore.collection('users').doc(this.$FireAuth.currentUser.uid).update({
+        dpURL: this.dpURL,
+        team: teamRef,
+      });
+      this.loading = false;
+      this.nextStep();
+    },
+    getFileBlob(url, cb) {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.responseType = 'blob';
+      xhr.addEventListener('load', function () {
+        cb(xhr.response);
+      });
+      xhr.send();
     },
   },
 };

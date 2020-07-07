@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import ClosedBeta from '../views/ClosedBeta.vue';
+import JoinTeam from '../views/JoinTeam.vue';
 
 Vue.use(VueRouter);
 
@@ -23,6 +24,11 @@ const routes = [
     path: '/closedbeta',
     name: 'ClosedBeta',
     component: ClosedBeta,
+  },
+  {
+    path: '/jointeam',
+    name: 'JoinTeam',
+    component: JoinTeam,
   },
 ];
 
