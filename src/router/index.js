@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import ClosedBeta from '../views/ClosedBeta.vue';
 import JoinTeam from '../views/JoinTeam.vue';
+import Download from '../views/Download.vue';
 
 Vue.use(VueRouter);
 
@@ -29,6 +30,11 @@ const routes = [
     path: '/jointeam',
     name: 'JoinTeam',
     component: JoinTeam,
+  },
+  {
+    path: '/download',
+    name: 'Download',
+    component: Download,
   },
 ];
 

@@ -1,5 +1,21 @@
 <template>
   <div>
+    <section v-if="sectionIndex == 0" class="hero is-fullheight">
+      <div class="container hero-body">
+        <div class="columns is-centered is-vcentered">
+          <div class="column is-full">
+            <h2 class="is-size-1">Welcome To The Sidebr Closed Beta</h2>
+            <h2 class="is-size-3">
+              We're so excited to have you try this
+            </h2>
+            <button class="button is-large" v-on:click="nextStep()"
+             style="background-color: #6890F6; color: #FFF">
+              Let's Go!
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- This is the Team Name Section -->
     <section v-if="sectionIndex == 1" class="hero is-fullheight">
     <div class="container hero-body">
@@ -119,7 +135,8 @@
             </a>
           </div>
         </div>
-        <button class="button is-medium is-success">
+        <button class="button is-medium is-success"
+        v-on:click="goToDownload()">
           That's The Whole Squad
         </button>
       </div>
@@ -137,7 +154,7 @@ export default {
   data() {
     return {
       teamName: '',
-      sectionIndex: 1,
+      sectionIndex: 0,
       fullName: '',
       email: '',
       password: '',
@@ -215,6 +232,11 @@ export default {
         cb(xhr.response);
       });
       xhr.send();
+    },
+    goToDownload() {
+      this.$router.push({
+        name: 'Download',
+      });
     },
   },
 };

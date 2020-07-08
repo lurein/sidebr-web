@@ -1,5 +1,22 @@
 <template>
   <div>
+    <section v-if="sectionIndex == 0" class="hero is-fullheight">
+      <div class="container hero-body">
+        <div class="columns is-centered is-vcentered">
+          <div class="column is-full">
+            <h2 class="is-size-1">Welcome to the Sidebr Closed Beta</h2>
+            <h3 class="is-size-4">
+              You've been invited to join {{ teamName }} on
+              the fastest communication platform ever made
+            </h3>
+            <button class="button is-large" v-on:click="nextStep()"
+             style="background-color: #6890F6; color: #FFF">
+              Let's Go!
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
     <section v-if="sectionIndex == 1" class="hero is-fullheight">
       <div class="container hero-body">
         <div class="columns is-centered is-vcentered">
@@ -85,7 +102,7 @@ export default {
   data() {
     return {
       teamName: '',
-      sectionIndex: 1,
+      sectionIndex: 0,
       fullName: '',
       email: '',
       password: '',
@@ -149,7 +166,7 @@ export default {
         team: teamRef,
       });
       this.loading = false;
-      this.nextStep();
+      this.goToDownload();
     },
     getFileBlob(url, cb) {
       const xhr = new XMLHttpRequest();
@@ -159,6 +176,11 @@ export default {
         cb(xhr.response);
       });
       xhr.send();
+    },
+    goToDownload() {
+      this.$router.push({
+        name: 'Download',
+      });
     },
   },
 };
