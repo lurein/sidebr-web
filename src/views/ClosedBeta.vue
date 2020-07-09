@@ -136,7 +136,8 @@
           </div>
         </div>
         <button class="button is-medium is-success"
-        v-on:click="goToDownload()">
+        v-bind:class="{ 'is-loading' : loading }"
+        v-on:click="submitForm()">
           That's The Whole Squad
         </button>
       </div>
@@ -147,8 +148,8 @@
 </template>
 <script>
 // @ is an alias to /src
-/* eslint-disable prefer-arrow-callback, prefer-template, no-unused-vars, arrow-parens */
-
+/* eslint-disable */
+import emailjs from 'emailjs-com';
 export default {
   name: 'ClosedBeta',
   data() {
@@ -237,6 +238,18 @@ export default {
       this.$router.push({
         name: 'Download',
       });
+    },
+    async submitForm() {
+      this.loading = true;
+      const data = {
+        teamEmails: this.teammates,
+        inviter: this.fullName,
+        teamName: this.teamName
+      };
+      const response = await this.$http.post('https://formspree.io/mvowwlde', data);
+      console.log(response);
+      this.loading = false;
+      this.goToDownload()
     },
   },
 };
