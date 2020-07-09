@@ -69,21 +69,22 @@
         <div class="columns is-centered is-vcentered">
           <div class="column is-full">
             <h2 class="is-size-2">Now lets pick a 🔥 photo for your avatar </h2>
-            <div class="file">
-              <label class="file-label">
-                <input class="file-input" type="file" @change="onFileChange" name="resume">
-                <span class="file-cta">
-                  <span class="file-icon">
-                    <i class="fas fa-upload"></i>
-                  </span>
-                  <span class="file-label">
-                    Choose a file…
-                  </span>
-                </span>
-              </label>
-            </div>
+            <picture-input
+              ref="pictureInput"
+              @change="onChanged"
+              @remove="onRemoved"
+              :width="256"
+              :removable="true"
+              removeButtonClass="ui red button"
+              :height="256"
+              accept="image/jpeg, image/png"
+              buttonClass="button"
+              :customStrings="{
+              upload: '<h1>Upload it!</h1>',
+              drag: 'Drag and drop your image here'}">
+            </picture-input>
             <button class="button is-medium is-success" v-bind:class="{ 'is-loading' : loading }"
-              v-if="dp !== null" v-on:click="uploadImage()">
+              v-if="image !== ''" v-on:click="uploadDP()">
               Good to go
             </button>
           </div>
@@ -96,9 +97,13 @@
 // @ is an alias to /src
 /* eslint-disable prefer-arrow-callback, prefer-template, no-unused-vars, arrow-parens */
 import * as firebase from 'firebase/app';
+import PictureInput from 'vue-picture-input';
 
 export default {
   name: 'JoinTeam',
+  components: {
+    PictureInput,
+  },
   data() {
     return {
       teamName: '',
@@ -106,9 +111,9 @@ export default {
       fullName: '',
       email: '',
       password: '',
-      dp: null,
       dpURL: '',
       loading: false,
+      image: '',
     };
   },
   mounted() {
@@ -141,23 +146,27 @@ export default {
         },
       );
     },
-    onFileChange(e) {
-      const file = e.target.files[0];
-      this.dp = URL.createObjectURL(file);
-    },
-    uploadImage() {
+    uploadDP() {
       this.loading = true;
-      this.getFileBlob(this.dp, blob => {
-        const this2 = this;
-        const storageRef = this.$FirebaseStorage.ref().child('userDPs/' + this.$FireAuth.currentUser.uid);
-        storageRef.put(blob).then(response => {
-          response.ref.getDownloadURL().then(downloadURL => {
-            this.dpURL = downloadURL;
-            this.updateUser();
-          });
-          console.log('Uploaded file!');
+      const storageRef = this.$FirebaseStorage.ref().child('userDPs/' + this.$FireAuth.currentUser.uid);
+      storageRef.put(this.image).then(response => {
+        response.ref.getDownloadURL().then(downloadURL => {
+          this.dpURL = downloadURL;
+          this.updateUser();
         });
+        console.log('Uploaded file!');
       });
+    },
+    onChanged() {
+      console.log('New picture loaded');
+      if (this.$refs.pictureInput.file) {
+        this.image = this.$refs.pictureInput.file;
+      } else {
+        console.log('Old browser. No support for Filereader API');
+      }
+    },
+    onRemoved() {
+      this.image = '';
     },
     updateUser() {
       const teamRef = this.$Firestore.doc('teams/' + this.teamName);
@@ -167,15 +176,6 @@ export default {
       });
       this.loading = false;
       this.goToDownload();
-    },
-    getFileBlob(url, cb) {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url);
-      xhr.responseType = 'blob';
-      xhr.addEventListener('load', function () {
-        cb(xhr.response);
-      });
-      xhr.send();
     },
     goToDownload() {
       this.$router.push({
