@@ -178,6 +178,15 @@ export default {
       this.loading = false;
       this.goToDownload();
     },
+    getFileBlob(url, cb) {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.responseType = 'blob';
+      xhr.addEventListener('load', function () {
+        cb(xhr.response);
+      });
+      xhr.send();
+    },
     goToDownload() {
       this.$router.push({
         name: 'Download',

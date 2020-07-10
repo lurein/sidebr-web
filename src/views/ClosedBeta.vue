@@ -200,6 +200,7 @@ export default {
         },
         function (err) {
           alert('Oops. ' + err.message);
+          this.loading = false;
         },
       );
     },
