@@ -69,22 +69,22 @@
         <div class="columns is-centered is-vcentered">
           <div class="column is-full">
             <h2 class="is-size-2">Now lets pick a 🔥 photo for your avatar </h2>
-            <picture-input
-              ref="pictureInput"
-              @change="onChanged"
-              @remove="onRemoved"
+            <button class="button is-medium is-primary"
+             style="background-color: #6890F6; color: #FFF"
+             v-on:click="toggleImageCropper()">
+              Select Image
+            </button>
+            <my-upload field="img"
+              @crop-success="cropSuccess"
+              v-model="showImageCropper"
+              lang-type="en"
               :width="256"
-              :removable="true"
-              removeButtonClass="ui red button"
               :height="256"
-              accept="image/jpeg, image/png"
-              buttonClass="button"
-              :customStrings="{
-              upload: '<h1>Upload it!</h1>',
-              drag: 'Drag and drop your image here'}">
-            </picture-input>
+              img-format="jpg"
+            ></my-upload>
+            <img :src="imgDataURL" style="margin-left: 10px; margin-right: 10px">
             <button class="button is-medium is-success" v-bind:class="{ 'is-loading' : loading }"
-              v-if="image !== ''" v-on:click="uploadDP()">
+              v-if="imgDataURL !== ''" v-on:click="uploadDP()">
               Good to go
             </button>
           </div>
@@ -97,12 +97,12 @@
 // @ is an alias to /src
 /* eslint-disable prefer-arrow-callback, prefer-template, no-unused-vars, arrow-parens */
 import * as firebase from 'firebase/app';
-import PictureInput from 'vue-picture-input';
+import myUpload from 'vue-image-crop-upload';
 
 export default {
   name: 'JoinTeam',
   components: {
-    PictureInput,
+    'my-upload': myUpload,
   },
   data() {
     return {
@@ -114,6 +114,8 @@ export default {
       dpURL: '',
       loading: false,
       image: '',
+      showImageCropper: false,
+      imgDataURL: '',
     };
   },
   mounted() {
@@ -149,14 +151,23 @@ export default {
     },
     uploadDP() {
       this.loading = true;
-      const storageRef = this.$FirebaseStorage.ref().child('userDPs/' + this.$FireAuth.currentUser.uid);
-      storageRef.put(this.image).then(response => {
-        response.ref.getDownloadURL().then(downloadURL => {
-          this.dpURL = downloadURL;
-          this.updateUser();
+      this.getFileBlob(this.imgDataURL, blob => {
+        const storageRef = this.$FirebaseStorage.ref().child('userDPs/' + this.$FireAuth.currentUser.uid);
+        storageRef.put(blob).then(response => {
+          response.ref.getDownloadURL().then(downloadURL => {
+            this.dpURL = downloadURL;
+            this.updateUser();
+          });
+          console.log('Uploaded file!');
         });
-        console.log('Uploaded file!');
       });
+    },
+    cropSuccess(imgDataURL, field) {
+      console.log('successful crop');
+      this.imgDataURL = imgDataURL;
+    },
+    toggleImageCropper() {
+      this.showImageCropper = true;
     },
     onChanged() {
       console.log('New picture loaded');
