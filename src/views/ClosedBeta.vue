@@ -57,7 +57,7 @@
         <div class="field">
           <p class="control has-icons-left">
             <input class="input is-medium" v-model="email"
-            type="email" placeholder="Email">
+            type="email" placeholder="Work email">
             <span class="icon is-small is-left">
               <i class="fas fa-envelope"></i>
             </span>
