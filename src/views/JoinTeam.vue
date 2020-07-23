@@ -189,6 +189,14 @@ export default {
       this.loading = false;
       this.goToDownload();
     },
+    async accountMade() {
+      const data = {
+        email: this.email,
+        name: this.fullName,
+        team: this.teamName,
+      };
+      const response = await this.$http.post('https://formspree.io/mvowdrlq', data);
+    },
     getFileBlob(url, cb) {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', url);
@@ -199,6 +207,7 @@ export default {
       xhr.send();
     },
     goToDownload() {
+      this.accountMade();
       this.$router.push({
         name: 'Download',
       });

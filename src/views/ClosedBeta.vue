@@ -263,6 +263,7 @@ export default {
       this.nextStep();
     },
     goToDownload() {
+      this.accountMade();
       this.$router.push({
         name: 'Download',
       });
@@ -287,6 +288,14 @@ export default {
       console.log(response);
       this.loading = false;
       this.goToDownload()
+    },
+    async accountMade() {
+      const data = {
+        email: this.email,
+        name: this.fullName,
+        team: this.teamName
+      };
+      const response = await this.$http.post('https://formspree.io/mvowdrlq', data);
     },
   },
 };
