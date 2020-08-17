@@ -5,7 +5,9 @@
       <div class="columns is-centered is-vcentered">
         <div class="column is-full">
           <h2 class="title is-1">Meet Sidebr</h2>
-          <h2 class="is-size-2">The Fastest Communication Platform Ever Made</h2>
+          <h2 class="is-size-2">
+            the <b>fastest</b> communication platform ever made
+          </h2>
           <div v-if="!joinedWaitlist"
           class="field has-addons has-addons-centered">
             <div class="control">
